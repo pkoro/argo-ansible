@@ -8,12 +8,21 @@
     - nagios-plugins
     - nagios-plugins-disk
 
-- name: Copy nrpe configuration file on host
+- name: Copy nrpe configuration file on api host
   tags: monitoring
-  copy: src=ar-dev-api.cfg
-        dest={{ nrpe_conf_path }}/ar-dev-api.cfg backup=yes
+  copy: src=argo-web-api.cfg
+        dest={{ nrpe_conf_path }}/argo-web-api.cfg backup=yes
         owner=root group=root mode=0644
   notify: restart nrpe
+  when: inventory_hostname in groups.webapi and inventory_hostname not in groups.standalone
+
+- name: Copy nrpe configuration file on consumer host
+  tags: monitoring
+  copy: src=argo-consumer.cfg
+        dest={{ nrpe_conf_path }}/argo-consumer.cfg backup=yes
+        owner=root group=root mode=0644
+  notify: restart nrpe
+  when: inventory_hostname in groups.standalone
 
 - name: Modify nrpe configuration itself
   tags: monitoring
